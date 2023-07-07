@@ -11,41 +11,49 @@ import Rocket from './sandboxes/Rocket'
 
 export default function App() {
   return (
-    <Canvas dpr={[1.5, 2]} camera={{ position: [-20, 40, 30], fov: 45, near: 1, far: 300 }}>
+    <Canvas dpr={[1.5, 2]} camera={{ position: [-40, 20, 40], fov: 60, near: 1, far: 300 }}>
       {/** The physics world */}
-      <Physics gravity={[0, -60, 0]}>
-        <Letter char="T" position={[0, 0, 0]} rotation={[0, 0, 0]}>
+      <Physics gravity={[-180, -420, 0]}>
+        <Letter char="T" position={[0, 1, 0]} rotation={[0, 0, 0]}>
           {/** The sandboxes dropped into here have no idea what's going to happen.
                For all intents and purposes they're just self-contained components.  */}
           <Turtle />
         </Letter>
-        <Letter char="0" position={[0, 0, 0]} rotation={[0, 0, 0]}>
+
+        <Letter char="0" position={[0, 1, 0]} rotation={[0, 0, 0]}>
           <Shoe scale={5} />
         </Letter>
-        <Letter char="P" position={[0, 0, 0]} rotation={[0, 0, 0]}>
+
+        <Letter char="P" position={[0, 1, 0]} rotation={[0, 0, 0]}>
           <Rocket position={[-1, -1, 0]} scale={0.6} />
         </Letter>
-        <Letter char="0" position={[0, 0, 0]} rotation={[10, 11, 12]}>
+
+        <Letter char="0" position={[0, 1, 0]} rotation={[0, 0, 0]}>
           <Basic scale={3} />
         </Letter>
-        <Letter char="L" position={[0, 0, 0]} rotation={[13, 14, 15]}>
+
+        <Letter char="L" position={[0, 1, 0]} rotation={[0, 0, 0]}>
           <PingPong />
         </Letter>
-        <Letter char="O" position={[0, 0, 0]} rotation={[16, 17, 18]} stencilBuffer>
+
+        <Letter char="O" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
+
         <Letter char="G" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
+
         <Letter char="Y" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
+
         {/** Invisible walls */}
         <CuboidCollider position={[0, -6, 0]} type="fixed" args={[100, 1, 100]} />
-        <CuboidCollider position={[0, 0, -30]} type="fixed" args={[30, 100, 1]} />
-        <CuboidCollider position={[0, 0, 10]} type="fixed" args={[30, 100, 1]} />
+        <CuboidCollider position={[0, 0, -42]} type="fixed" args={[42, 100, 1]} />
+        <CuboidCollider position={[0, 0, 36]} type="fixed" args={[36, 100, 1]} />
         <CuboidCollider position={[-30, 0, 0]} type="fixed" args={[1, 100, 30]} />
-        <CuboidCollider position={[30, 0, 0]} type="fixed" args={[1, 100, 30]} />
+        {/* <CuboidCollider position={[30, 0, 0]} type="fixed" args={[1, 100, 30]} /> */}
       </Physics>
       {/** Environment (for reflections) */}
       <Environment files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr" resolution={1024}>
