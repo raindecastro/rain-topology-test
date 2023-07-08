@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import { Text3D, Center, Preload, Lightformer, Environment, CameraControls, RenderTexture, ContactShadows, MeshTransmissionMaterial } from '@react-three/drei'
 import { Physics, RigidBody, CuboidCollider } from '@react-three/rapier'
@@ -8,52 +8,94 @@ import PingPong from './sandboxes/PingPong'
 import Shoe from './sandboxes/Shoe'
 import Stencil from './sandboxes/Stencil'
 import Rocket from './sandboxes/Rocket'
+import CanvasCamera from './sandboxes/CanvasCamera'
+
+const DEG45 = Math.PI / 8
 
 export default function App() {
+  const cameraControlRef = useRef(null)
+
+  useEffect(() => {
+    if (cameraControlRef) {
+      console.log('RAN')
+      let x = 0
+      let id = null
+      setTimeout(() => {
+        id = setInterval(() => {
+          console.log(cameraControlRef.current)
+          cameraControlRef.current?.truck(x, 0, true)
+          x = x + 1
+
+          if (x === 15) {
+            console.log('CLEAR')
+            setTimeout(() => {
+              cameraControlRef.current?.forward(-80, true)
+              cameraControlRef.current?.rotate(-DEG45, 0, true)
+              cameraControlRef.current?.truck(-92, 0, true)
+            }, 2000)
+            clearInterval(id)
+          }
+        }, 220)
+      }, 1000)
+    }
+
+    return () => {
+      clearInterval(id)
+    }
+  }, [])
+
+  // useFrame(() => {
+  //   const widthHalf = size.width / 2
+  //   const targetX = (viewport.width - size.width) / 2
+
+  //   controls.current.target.x = targetX
+  // })
+
   return (
-    <Canvas dpr={[1.5, 2]} camera={{ position: [-40, 20, 40], fov: 60, near: 1, far: 300 }}>
+    <Canvas dpr={[1.5, 2]} camera={{ position: [0, 0, 40], fov: 75, near: 1, far: 1000 }}>
       {/** The physics world */}
-      <Physics gravity={[-180, -420, 0]}>
-        <Letter char="T" position={[0, 1, 0]} rotation={[0, 0, 0]}>
+      {/* <CameraControls ref={cameraControlRef} /> */}
+      <Physics gravity={[0, -20, 0]} interpolation={false} colliders={false}>
+        <Letter char="T" position={[12, 8, 0]} rotation={[0, 0, 0]}>
           {/** The sandboxes dropped into here have no idea what's going to happen.
                For all intents and purposes they're just self-contained components.  */}
           <Turtle />
         </Letter>
 
-        <Letter char="0" position={[0, 1, 0]} rotation={[0, 0, 0]}>
+        <Letter char="0" position={[24, 16, 0]} rotation={[0, 0, 0]}>
           <Shoe scale={5} />
         </Letter>
 
-        <Letter char="P" position={[0, 1, 0]} rotation={[0, 0, 0]}>
+        <Letter char="P" position={[34, 24, 0]} rotation={[0, 0, 0]}>
           <Rocket position={[-1, -1, 0]} scale={0.6} />
         </Letter>
 
-        <Letter char="0" position={[0, 1, 0]} rotation={[0, 0, 0]}>
+        <Letter char="0" position={[52, 32, 2]} rotation={[0, 0, 0]}>
           <Basic scale={3} />
         </Letter>
 
-        <Letter char="L" position={[0, 1, 0]} rotation={[0, 0, 0]}>
+        <Letter char="L" position={[64, 40, 0]} rotation={[0, 0, 0]}>
           <PingPong />
         </Letter>
 
-        <Letter char="O" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
+        <Letter char="0" position={[74, 52, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
 
-        <Letter char="G" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
+        <Letter char="G" position={[86, 70, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
 
-        <Letter char="Y" position={[0, 0, 0]} rotation={[0, 0, 0]} stencilBuffer>
+        <Letter char="Y" position={[100, 86, 0]} rotation={[0, 0, 0]} stencilBuffer>
           <Stencil scale={2} />
         </Letter>
 
         {/** Invisible walls */}
-        <CuboidCollider position={[0, -6, 0]} type="fixed" args={[100, 1, 100]} />
-        <CuboidCollider position={[0, 0, -42]} type="fixed" args={[42, 100, 1]} />
-        <CuboidCollider position={[0, 0, 36]} type="fixed" args={[36, 100, 1]} />
+        <CuboidCollider position={[0, -6, 0]} type="fixed" args={[200, 1, 200]} />
+        <CuboidCollider position={[0, 0, -48]} type="fixed" args={[48, 100, 1]} />
+        <CuboidCollider position={[0, 0, 6]} type="fixed" args={[6, 100, 1]} />
         <CuboidCollider position={[-30, 0, 0]} type="fixed" args={[1, 100, 30]} />
-        {/* <CuboidCollider position={[30, 0, 0]} type="fixed" args={[1, 100, 30]} /> */}
+        <CuboidCollider position={[30, 0, 0]} type="fixed" args={[1, 100, 30]} />
       </Physics>
       {/** Environment (for reflections) */}
       <Environment files="https://dl.polyhaven.org/file/ph-assets/HDRIs/hdr/1k/dancing_hall_1k.hdr" resolution={1024}>
@@ -70,7 +112,7 @@ export default function App() {
       {/** Contact shadows for naive soft shadows */}
       <ContactShadows smooth={false} scale={100} position={[0, -5.05, 0]} blur={0.5} opacity={0.75} />
       {/** Yomotsu/camera-controls, a better replacement for OrbitControls */}
-      <CameraControls makeDefault dollyToCursor minPolarAngle={0} maxPolarAngle={Math.PI / 2} />
+      <CameraControls ref={cameraControlRef} makeDefault dollyToCursor minPolarAngle={0} maxPolarAngle={Math.PI / 2} />
       {/** Makes sure everything is processed and GPU uploaded before Threejs "sees" it */}
       <Preload all />
     </Canvas>
